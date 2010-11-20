@@ -35,6 +35,12 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import supybot.ircmsgs as ircmsgs
 import supybot.ircdb as ircdb
+import httplib
+
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 
 class fNord(callbacks.Plugin):
@@ -96,14 +102,54 @@ class fNord(callbacks.Plugin):
             irc.reply('yeah you are admin')
     test = wrap(test)
 	
-	def status(self, irc, msg, args, toSet, password):
-		"""[<open|close><password>]
-		
-		open or close fNordeingang.
-		"""
-		
-		
-	status = wrap(status)
+    def status(self, irc, msg, args, toSet, password):
+        """[<open|close> <password>]
+        
+        Open or close fNordeingang. No argument will return its current state.
+        """
+        if toSet is not None:
+            if toSet == 'open':
+                if password is not None:
+                    # check if it's already open
+                    conn = httplib.HTTPConnection("fnordeingang.de:4242")
+                    conn.request("GET", "/")
+                    response = conn.getresponse()
+                    status = json.loads(response.read())
+                    if status.get('open'):
+                        irc.reply("fNordeingang is already open!");
+                    else:
+                        None # Todo:
+                        
+                else:
+                    irc.error('no password', Raise=True)
+            elif toSet == 'close':
+                if password is not None:
+                     # check if it's already close
+                    conn = httplib.HTTPConnection("fnordeingang.de:4242")
+                    conn.request("GET", "/")
+                    response = conn.getresponse()
+                    status = json.loads(response.read())
+                    if status.get('open'):
+                        None # Todo
+                    else:
+                        irc.reply("fNordeingang is already closed!");
+                else:
+                    irc.error('no password', Raise=True)
+            else:
+                irc.error('unknown command: "' + toSet + '". Please use "close" or "open".', Raise=True)
+        else:
+            conn = httplib.HTTPConnection("fnordeingang.de:4242")
+            conn.request("GET", "/")
+            response = conn.getresponse()
+            status = json.loads(response.read())
+            if status.get('open'):
+                irc.reply("fNordeingang is open!");
+            else:
+                irc.reply("fNordeingang is closed!");
+            
+
+        #irc.reply(password)
+    status = wrap(status, [optional('anything'), optional('anything')])
 
 Class = fNord
 
