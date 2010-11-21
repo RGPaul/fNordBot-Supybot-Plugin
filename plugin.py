@@ -35,7 +35,7 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import supybot.ircmsgs as ircmsgs
 import supybot.ircdb as ircdb
-import httplib
+import httplib, urllib
 
 try:
     import json
@@ -118,7 +118,14 @@ class fNord(callbacks.Plugin):
                     if status.get('open'):
                         irc.reply("fNordeingang is already open!");
                     else:
-                        None # Todo:
+                        # send toggle command
+                        jsonobj = json.dumps({'password':password})
+                        params = urllib.urlencode({'jsondata':jsonobj})
+                        headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+                        conn.request("POST", "/toggle", params, headers)
+                        response = conn.getresponse()
+                        if response.status == 401:
+                            irc.error('401: wrong password?', Raise=True)
                         
                 else:
                     irc.error('no password', Raise=True)
@@ -130,7 +137,14 @@ class fNord(callbacks.Plugin):
                     response = conn.getresponse()
                     status = json.loads(response.read())
                     if status.get('open'):
-                        None # Todo
+                        # send toggle command
+                        jsonobj = json.dumps({'password':password})
+                        params = urllib.urlencode({'jsondata':jsonobj})
+                        headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+                        conn.request("POST", "/toggle", params, headers)
+                        response = conn.getresponse()
+                        if response.status == 401:
+                            irc.error('401: wrong password?', Raise=True)
                     else:
                         irc.reply("fNordeingang is already closed!");
                 else:
