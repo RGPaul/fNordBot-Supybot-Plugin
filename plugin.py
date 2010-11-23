@@ -42,7 +42,6 @@ try:
 except ImportError:
     import simplejson as json
 
-
 class fNord(callbacks.Plugin):
     """This plugin provides a few functions used for the channel #fnordeingang."""
     def __init__(self, irc):
