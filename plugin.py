@@ -125,6 +125,8 @@ class fNord(callbacks.Plugin):
                         response = conn.getresponse()
                         if response.status == 401:
                             irc.error('401: wrong password?', Raise=True)
+                        else:
+                            irc.reply("fNordeingang is now open!");
                         
                 else:
                     irc.error('no password', Raise=True)
@@ -144,6 +146,8 @@ class fNord(callbacks.Plugin):
                         response = conn.getresponse()
                         if response.status == 401:
                             irc.error('401: wrong password?', Raise=True)
+                        else:
+                            irc.reply("fNordeingang is now closed!");
                     else:
                         irc.reply("fNordeingang is already closed!");
                 else:
